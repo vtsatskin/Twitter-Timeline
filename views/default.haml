@@ -1,0 +1,21 @@
+!!!
+%html
+  %head
+    %title TUHB
+    %link{:rel => 'stylesheet', :href => '/css/bootstrap.css', :type => 'text/css', :media => 'screen' }
+    %link{:rel => 'stylesheet', :href => '/css/main.css', :type => 'text/css', :media => 'screen' }
+    %script{:src => '/js/jquery-1.7.1.min.js'}
+    %script{:src => '/js/auto.tooltip.js'}
+    %script{:src => '/js/ajax.forms.js'}
+
+    %script{:src => '/js/bootstrap.min.js'}
+    %script{:src => '/js/bootstrap-alert.js'}
+    %script{:src => '/js/bootstrap-tooltip.js'}
+  %body
+    .navbar.navbar-fixed-top
+      .navbar-inner
+        .container
+          %a.brand{:href => '/'}
+            TUHB
+    .container
+      =yield

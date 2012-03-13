@@ -1,0 +1,9 @@
+body {
+  padding-top: 70px;
+}
+.centered {
+  text-align: center !important;
+}
+table.table .highlight {
+  background-color: #f5f5f5;
+}
