@@ -10,4 +10,4 @@ elsif APP_ENV == 'test'
 end
 
 MongoMapper.connection.connect
-Dir[Dir.pwd + '/models/*.rb'].each {|file| require file } # load Models
+Dir[Dir.pwd + '/models/*.rb'].each {|file| load file } # load Models

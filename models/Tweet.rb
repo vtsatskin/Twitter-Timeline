@@ -21,7 +21,7 @@ class Tweet
     if key_name == :created_at
       key key_name, Time
     elsif key_name == :id_str
-      key :tweet_id, String
+      key :tweet_id, String, :unique => true
     elsif key_name == :truncated
       key key_name, Boolean
     else
@@ -30,7 +30,7 @@ class Tweet
   end
   STORED_TWEET_USER_DATA_KEYS.each { |key_name| key "user_#{key_name}".to_sym, String }
 
-  # TODO: indexes
+  ensure_index [[:user_screen_name, 1], [:created_at, -1]]
 
   def self.store_tweets_for screen_name
     # TOOD: use since paramater when calling TwitterHelper#retrieve_all_tweets_for
@@ -40,10 +40,7 @@ class Tweet
 
   # Stores tweets in batches of 200 until done
   def self.store_tweets_in_batches_for screen_name
-    # TweetHelper::
     until (tweet_batch = TwitterHelper.retrieve_a_batch_of_tweets_for(screen_name)).empty?
-      puts "Storing tweets (#{tweet_batch.count})"
-      pp y tweet_batch
       tweet_batch.each { |tweet| self.store_tweet_from_grackle tweet }
     end
   end
@@ -52,7 +49,7 @@ class Tweet
     data = {}
     STORED_TWEET_DATA_KEYS.each do |key_name|
       if key_name == :id_str
-        data[:tweet_id] == grackle_tweet.send(:id_str)
+        data[:tweet_id] = grackle_tweet.id_str
       else
         data[key_name] = grackle_tweet.send(key_name)
       end

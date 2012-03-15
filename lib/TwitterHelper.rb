@@ -1,11 +1,11 @@
 require 'grackle'
 # TODO: possibly have this extend Grackle::client
 module TwitterHelper
-  TWEET_BATCH_SIZE = 200 # The number of tweets to query for at a time, current API limit is 200
+  TWEET_BATCH_SIZE = 100 # The number of tweets to query for at a time, current API limit is 200
 
   @client = Grackle::Client.new
 
-  def client
+  def self.client
     @client
   end
 
@@ -34,11 +34,32 @@ module TwitterHelper
   def self.retrieve_a_batch_of_tweets_for screen_name
     latest_tweet = Tweet.where(:user_screen_name => screen_name).sort(:created_at.desc).first
     earliest_tweet = Tweet.where(:user_screen_name => screen_name).sort(:created_at.asc).first
-    tweets_after_latest = @client.statuses.user_timeline.json?({:screen_name => screen_name, :count => TWEET_BATCH_SIZE, :include_rts => false, :since_id => latest_tweet.id_str})
+    
+    # Get newer tweets if we have a latest one
+    since_id = latest_tweet.tweet_id if latest_tweet
 
-    if tweets_after_latest.empty?
-      tweets_before_earliest = @client.statuses.user_timeline.json?({:screen_name => screen_name, :count => TWEET_BATCH_SIZE, :include_rts => false, :max_id => earliest_tweet.id_str})
-      return tweets_before_earliest
+    # Twitter API paramaters
+    api_params = {
+      :screen_name => screen_name,
+      :count => TWEET_BATCH_SIZE,
+      :include_rts => false
+    }
+    api_params[:since_id] = since_id if since_id
+
+    tweets_after_latest = @client.statuses.user_timeline.json?(api_params)
+
+    if tweets_after_latest.nil? || tweets_after_latest.empty?
+      max_id = earliest_tweet.tweet_id if earliest_tweet
+
+      # Clean up API params for next call
+      api_params.delete :since_id
+      api_params[:max_id] = max_id
+
+      tweets_before_earliest = @client.statuses.user_timeline.json?(api_params)
+      # Twitter includes the tweet specified in max_id, remove it. We are assuming it's always first'
+      tweets_before_earliest.shift
+
+      return tweets_before_earliest 
     else
       return tweets_after_latest
     end
