@@ -9,14 +9,18 @@ class Tweet
     :id_str,
     :truncated,
     :source,
-    :id,
     :text
+  ]
+  STORED_TWEET_USER_DATA_KEYS = [
+    :id_str,
+    :screen_name,
+    :name
   ]
 
   STORED_TWEET_DATA_KEYS.each do |key_name|
     if key_name == :created_at
       key key_name, Time
-    elsif key_name == :id
+    elsif key_name == :id_str
       key :tweet_id, String
     elsif key_name == :truncated
       key key_name, Boolean
@@ -24,21 +28,36 @@ class Tweet
       key key_name, String
     end
   end
+  STORED_TWEET_USER_DATA_KEYS.each { |key_name| key "user_#{key_name}".to_sym, String }
+
+  # TODO: indexes
 
   def self.store_tweets_for screen_name
     # TOOD: use since paramater when calling TwitterHelper#retrieve_all_tweets_for
-    th = TwitterHelper.new
-    tweets = th.retrieve_all_tweets_for(screen_names)
-    tweets.map { |tweet| store_tweet_from_grackle tweet }
+    tweets = TwitterHelper.retrieve_all_tweets_for(screen_names)
+    tweets.map { |tweet| self.store_tweet_from_grackle tweet }
   end
 
-  private
+  # Stores tweets in batches of 200 until done
+  def self.store_tweets_in_batches_for screen_name
+    # TweetHelper::
+    until (tweet_batch = TwitterHelper.retrieve_a_batch_of_tweets_for(screen_name)).empty?
+      puts "Storing tweets (#{tweet_batch.count})"
+      pp y tweet_batch
+      tweet_batch.each { |tweet| self.store_tweet_from_grackle tweet }
+    end
+  end
 
-  def store_tweet_from_grackle grackle_tweet
+  def self.store_tweet_from_grackle grackle_tweet
     data = {}
     STORED_TWEET_DATA_KEYS.each do |key_name|
-      data[key_name] = grackle_tweet.send(key_name)
+      if key_name == :id_str
+        data[:tweet_id] == grackle_tweet.send(:id_str)
+      else
+        data[key_name] = grackle_tweet.send(key_name)
+      end
     end
+    STORED_TWEET_USER_DATA_KEYS.each { |key_name| data["user_#{key_name}".to_sym] = grackle_tweet.user.send(key_name) }
     Tweet.create data
   end
 end

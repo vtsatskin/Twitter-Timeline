@@ -12,11 +12,20 @@ describe Tweet do
   end
 
   describe "::store_tweets_for" do
-    it "should do something"
+    it "should do something" do
+      
+    end
   end
 
-  describe "::store_tweets_for" do
-    it "should " do
+  describe "::store_tweet_from_grackle" do
+    let(:grackle) { Grackle::Client.new }
+    it "should store a valid tweet from grackle" do
+      tweet = grackle.statuses.show.json?({:id => 1110})
+      stored_tweet = Tweet.store_tweet_from_grackle(tweet)
+      Tweet.last.new_record?.should == false
+      pp y Tweet.last
+    end
+    it "should not store an invalid tweet from grackle" do
       
     end
   end

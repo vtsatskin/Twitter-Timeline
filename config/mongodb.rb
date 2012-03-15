@@ -1,3 +1,4 @@
+APP_ENV ||= 'development'
 require 'mongo_mapper'
 
 if APP_ENV == 'development'
