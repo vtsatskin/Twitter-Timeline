@@ -7,3 +7,7 @@ body {
 table.table .highlight {
   background-color: #f5f5f5;
 }
+#days h4 { float: left; clear: left; }
+#days .tweet_count { float: left; margin-left: 0.2em; }
+.hidden { display: none; }
+.selected { color: blue; }

@@ -11,3 +11,4 @@ end
 
 MongoMapper.connection.connect
 Dir[Dir.pwd + '/models/*.rb'].each {|file| load file } # load Models
+Dir[Dir.pwd + '/mapreduce/*.rb'].each {|file| load file } # load Maps

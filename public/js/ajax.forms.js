@@ -17,15 +17,15 @@ $(function(){
         if(output_id = form.data('output')) {
           // Insert response into DOM
           console.log(response);
-          $('#' + output_id).html(data);
+          $('#' + output_id).html(response).addClass('alert').addClass('alert-success');
         }
       })
       .error(function(response){
         if(output_id = form.data('output')) {
           btn.attr('disabled', false).text(old_text).addClass('error');
           // Insert response into DOM
-          console.log(response);
-          $('#' + output_id).html(data);
+          console.log(response.responseText);
+          $('#' + output_id).html(response.responseText).addClass('alert').addClass('alert-error');
         }
       });
     return false; // prevent default behaviour

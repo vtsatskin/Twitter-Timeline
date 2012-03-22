@@ -6,7 +6,7 @@ class Tweet
     :in_reply_to_user_id_str,
     :in_reply_to_status_id_str,
     :created_at,
-    :id_str,
+    :id,
     :truncated,
     :source,
     :text
@@ -18,11 +18,13 @@ class Tweet
   ]
 
   STORED_TWEET_DATA_KEYS.each do |key_name|
-    if key_name == :created_at
+    case key_name
+
+    when :created_at
       key key_name, Time
-    elsif key_name == :id_str
-      key :tweet_id, String, :unique => true
-    elsif key_name == :truncated
+    when :id
+      key :tweet_id, Integer, :unique => true
+    when :truncated
       key key_name, Boolean
     else
       key key_name, String
@@ -45,11 +47,18 @@ class Tweet
     end
   end
 
+  # Stores a tweet batch
+  def self.store_a_batch_of_tweets_for screen_name
+    unless (tweet_batch = TwitterHelper.retrieve_a_batch_of_tweets_for(screen_name)).empty?
+      tweet_batch.each { |tweet| self.store_tweet_from_grackle tweet }
+    end
+  end
+
   def self.store_tweet_from_grackle grackle_tweet
     data = {}
     STORED_TWEET_DATA_KEYS.each do |key_name|
-      if key_name == :id_str
-        data[:tweet_id] = grackle_tweet.id_str
+      if key_name == :id
+        data[:tweet_id] = grackle_tweet.id
       else
         data[key_name] = grackle_tweet.send(key_name)
       end

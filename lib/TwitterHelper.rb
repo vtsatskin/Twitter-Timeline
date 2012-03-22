@@ -32,9 +32,11 @@ module TwitterHelper
 
   # This assumes there are no missing tweets between the earliest and the latest tweets
   def self.retrieve_a_batch_of_tweets_for screen_name
+    throw :empty_screen_name if screen_name.empty?
+
     latest_tweet = Tweet.where(:user_screen_name => screen_name).sort(:created_at.desc).first
     earliest_tweet = Tweet.where(:user_screen_name => screen_name).sort(:created_at.asc).first
-    
+
     # Get newer tweets if we have a latest one
     since_id = latest_tweet.tweet_id if latest_tweet
 
@@ -56,6 +58,7 @@ module TwitterHelper
       api_params[:max_id] = max_id
 
       tweets_before_earliest = @client.statuses.user_timeline.json?(api_params)
+
       # Twitter includes the tweet specified in max_id, remove it. We are assuming it's always first'
       tweets_before_earliest.shift
 
@@ -64,7 +67,7 @@ module TwitterHelper
       return tweets_after_latest
     end
   end
-  
+
   def self.tweet_count_for screen_name
     throw :empty_screen_name if screen_name.empty?
 

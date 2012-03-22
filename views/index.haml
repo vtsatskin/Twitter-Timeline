@@ -1,0 +1,22 @@
+.row
+  #fetch-message.span6
+    
+.row
+  .span6
+    %form.form-horizontal{:method => 'post', :action =>"/fetch_tweets", :'data-remote' => "true", :'data-output' => 'fetch-message'}
+      %fieldset
+        %legend Queue something
+        .control-group
+          %label.control-label{:for => 'screen_name'} Twitter Screen Name:
+          .controls
+            %input.span3#screen_name{:type => 'text', :name => 'screen_name'}
+        .form-actions
+          %input.btn{:type => 'submit', :value => 'Queue'}
+  .span6
+    - if @users
+      %h4 Users
+      %hr
+      %ul
+        - @users.each do |user|
+          %li
+            %a{:href => "/user/#{user['_id']}"}= user['_id']
