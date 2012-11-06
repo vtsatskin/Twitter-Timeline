@@ -2,11 +2,19 @@ class DateMapReduce
   def self.run screen_name = nil
     map = <<JS
       function(){
+        // Set all dates to midnight of day
+        var date = this.created_at;
+        date.setUTCHours(0);
+        date.setUTCMinutes(0);
+        date.setUTCSeconds(0);
+        date.setUTCMilliseconds(0);
+
         key = {
           screen_name: this.user_screen_name,
-          year: this.created_at.getFullYear(),
-          month: this.created_at.getMonth(),
-          day: this.created_at.getDay(),
+          year: this.created_at.getUTCFullYear(),
+          month: this.created_at.getUTCMonth(),
+          day: this.created_at.getUTCDate(),
+          time: date,
         }
         emit(key, {tweet_count: 1, tweet_ids: [this.tweet_id]});
       }

@@ -24,15 +24,18 @@ class DateMap
   # Searching by Twitter screen name
   ensure_index '_id.screen_name'
 
+  # Ordering by time
+  ensure_index '_id.time'
+
   # Finds DateMaps which ids contain keys and values specified in options
   # TODO: convert to scope
   def self.find_by options = {}
     conditions = {}
     options.each do |key, value|
-      conditions["_id.#{key}"] = value
+      conditions[:"_id.#{key}"] = value
     end
 
-    self.where(conditions).all
+    self.where(conditions).sort(:'_id.time'.desc).all
   end
 
   # Finds the unique occurance of a field based on supplied key and value pairs

@@ -11,3 +11,5 @@ table.table .highlight {
 #days .tweet_count { float: left; margin-left: 0.2em; }
 .hidden { display: none; }
 .selected { color: blue; }
+
+#bottom { position: absolute; bottom: 0; }
